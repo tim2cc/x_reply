@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>X Auto Replier</title><style>
+:root{
+  --bg:#060606;
+  --bg-2:#000;
+  --surface:#1f1f1f;
+  --surface-2:#252525;
+  --line:#1f1f1f;
+  --line-2:#2b2b2b;
+  --text:#e9e9e9;
+  --text-dim:#8a8a8a;
+  --accent:#c5ff4a;
+  --danger:#ff5c5c;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{
+  font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--text);
+  margin:0;
+  padding:32px 24px 64px;
+}
+.wrap{max-width:1240px;margin:0 auto}
+header{margin:0 0 20px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+h1{margin:0 0 6px;font-size:22px;font-weight:600;letter-spacing:.02em}
+.sub{margin:0;color:var(--text-dim);font-size:13px}
+.warning{
+  border:1px solid var(--line);
+  border-left:2px solid var(--accent);
+  background:var(--bg-2);
+  color:#cfcfcf;
+  padding:14px 16px;
+  font-size:12.5px;
+  margin:0 0 20px;
+}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.section{
+  grid-column:span 12;
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  padding:20px;
+}
+.section.col-5{grid-column:span 5}
+.section.col-7{grid-column:span 7}
+.section h2{
+  margin:0 0 16px;
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  color:var(--text-dim);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.section h2::before{content:"";width:6px;height:6px;background:var(--accent);flex:none}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
+label{display:block;margin:0}
+.lbl{
+  display:block;
+  margin-bottom:6px;
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--text-dim);
+}
+input,select,textarea{
+  width:100%;
+  padding:9px 10px;
+  background:var(--surface);
+  border:1px solid var(--surface-2);
+  border-radius:0;
+  color:var(--text);
+  font:inherit;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{min-height:120px;resize:vertical;line-height:1.5}
+#prompt{min-height:150px}
+#prompts{min-height:160px}
+.full{grid-column:1/-1}
+.actions,.ai-actions{margin:0 0 12px}
+.ai-actions{margin-bottom:16px}
+button{
+  padding:9px 16px;
+  margin:0 8px 8px 0;
+  background:transparent;
+  border:1px solid var(--surface-2);
+  border-radius:0;
+  color:var(--text);
+  font:inherit;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+button:hover{border-color:var(--accent);color:#fff}
+button.primary{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+button.primary:hover{background:#d4ff6e;color:#000}
+button.danger{border-color:#3a2020;color:var(--danger)}
+button.danger:hover{border-color:var(--danger);color:var(--danger)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#status{
+  margin-top:12px;
+  min-height:18px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--accent);
+}
+.logs-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.logs-head h2{margin:0}
+.logs-head button{margin:0}
+.note{margin:0 0 14px;color:var(--text-dim);font-size:12px}
+#logs{
+  margin:0;
+  height:360px;
+  overflow:auto;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  border-radius:0;
+  color:#c9d7b0;
+  padding:14px 16px;
+  font:12.5px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;
+  resize:vertical;
+}
+.log-line{display:block;min-height:21px;padding:1px 0}.log-line::before{content:'› ';color:#60724b}.log-time{color:#64735a}.log-ok{color:#c5ff4a;text-shadow:0 0 7px rgba(197,255,74,.18)}.log-send{color:#8dffb0}.log-retry{color:#ffd166}.log-error{color:#ff7272}.log-scroll{color:#8ed8ff}.log-run{color:#d5b8ff}.log-muted{color:#9aa394}
+@media(max-width:900px){
+  .section.col-5,.section.col-7{grid-column:span 12}
+}
+@media(max-width:700px){
+  html,body{width:620px;min-width:620px}
+  body{padding:24px 20px 48px}
+  .wrap{max-width:none}
+  .grid{grid-template-columns:1fr 1fr}
+  .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  body{padding:20px 14px 48px}
+  .fields{grid-template-columns:1fr}
+}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin:0 0 20px}.tab{border:0;border-bottom:2px solid transparent;margin:0;padding:11px 16px;background:transparent;color:var(--text-dim);font:600 11px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.tab:hover{color:var(--text)}.tab.active{border-bottom-color:var(--accent);color:var(--accent)}.tab-panel[hidden]{display:none}.dash-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric{background:var(--bg-2);border:1px solid var(--line);padding:18px;min-height:112px}.metric-label{color:var(--text-dim);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.metric-value{margin-top:14px;color:var(--text);font:300 31px/1.05 Georgia,serif}.metric-value.accent{color:var(--accent)}.dash-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.dash-card{background:var(--bg-2);border:1px solid var(--line);padding:20px}.dash-card h2{margin:0 0 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--text-dim)}.progress{height:8px;background:var(--surface);border:1px solid var(--surface-2);margin:14px 0 8px}.progress>span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}.dash-meta{display:flex;justify-content:space-between;gap:12px;color:var(--text-dim);font:12px ui-monospace,monospace}.dash-list{margin:0;padding:0;list-style:none;font:12px/1.55 ui-monospace,monospace;color:#c9d7b0}.dash-list li{padding:8px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.dash-list li:last-child{border-bottom:0}.dash-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chart-wrap{width:100%;min-height:240px;background:var(--surface);border:1px solid var(--surface-2);padding:12px;overflow-x:auto}.chart-wrap svg{display:block;width:100%;min-width:520px;height:230px}.chart-grid{stroke:#3d3d3d;stroke-width:1}.chart-bar{fill:#c5ff4a}.chart-label{fill:#8a8a8a;font:10px ui-monospace,monospace}.chart-empty{display:flex;align-items:center;justify-content:center;height:216px;color:#8a8a8a;font:12px ui-monospace,monospace}
+@media(max-width:700px){.dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-layout{grid-template-columns:1fr}}
+</style></head>
+<body>
+<div class="wrap">
+<header>
+  <h1>X Accessible Auto Replier</h1>
+  <p class="sub">Управление автоматическими ответами и диагностика</p>
+</header>
+
+<nav class="tabs" aria-label="Разделы расширения"><button class="tab active" type="button" data-tab="dashboard">Дашборд</button><button class="tab" type="button" data-tab="settings">Настройки</button></nav>
+
+<section id="tab-dashboard" class="tab-panel">
+  <div class="dash-grid"><article class="metric"><div class="metric-label">Отправлено сегодня</div><div id="dash-sent" class="metric-value accent">—</div></article><article class="metric"><div class="metric-label">Дневной лимит</div><div id="dash-cap" class="metric-value">—</div></article><article class="metric"><div class="metric-label">Всего ответов</div><div id="dash-total" class="metric-value">—</div></article><article class="metric"><div class="metric-label">Cooldown авторов</div><div id="dash-cooldown" class="metric-value">—</div></article><article class="metric"><div class="metric-label">AI-запросы</div><div id="dash-ai-requests" class="metric-value">—</div></article><article class="metric"><div class="metric-label">Ошибки AI</div><div id="dash-ai-errors" class="metric-value">—</div></article><article class="metric"><div class="metric-label">Завершено раундов</div><div id="dash-runs" class="metric-value">—</div></article><article class="metric"><div class="metric-label">Пропущено целей</div><div id="dash-skipped" class="metric-value">—</div></article></div>
+  <div class="dash-layout"><section class="dash-card"><h2>Дневной прогресс</h2><div class="progress"><span id="dash-progress"></span></div><div class="dash-meta"><span id="dash-progress-label">—</span><span id="dash-mode">—</span></div><div class="dash-actions"><button id="dash-settings" type="button">Открыть настройки</button><button id="dash-clear-logs" type="button">Очистить логи</button></div></section><section class="dash-card"><h2>Состояние системы</h2><ul class="dash-list"><li id="dash-batch">Batch: —</li><li id="dash-last">Последнее событие: —</li><li id="dash-events">Событий в журнале: —</li><li id="dash-cooldown-detail">Cooldown: —</li></ul></section></div>
+  <section class="dash-card" style="margin-top:16px"><h2>Последние операции</h2><ul id="dash-recent" class="dash-list"><li>Загрузка…</li></ul></section>
+  <section class="dash-card" style="margin-top:16px"><h2>История ответов · всё время</h2><div id="dash-chart" class="chart-wrap"><div class="chart-empty">Загрузка…</div></div></section>
+</section>
+
+<section id="tab-settings" class="tab-panel" hidden><div class="warning">Автоматический режим публикует ответы без отдельного подтверждения. Используйте его только для заранее разрешённых целей и остановите при любой неопределённости.</div>
+
+<div class="grid">
+
+  <section class="section col-5">
+    <h2>Режим и аккаунт</h2>
+    <div class="fields">
+      <label><span class="lbl">Режим</span><select id="mode">
+        <option value="draft">Черновик</option>
+        <option value="confirm">Подтверждение</option>
+        <option value="auto">Автоматический</option>
+      </select></label>
+      <label><span class="lbl">Ваш @ник</span><input id="myHandle" placeholder="@you"></label>
+    </div>
+  </section>
+
+  <section class="section col-7">
+    <h2>Управление</h2>
+    <div class="actions">
+      <button id="save" class="primary">Сохранить настройки</button>
+      <button id="start">Запустить на текущей вкладке</button>
+      <button id="stop" class="danger">Аварийно остановить</button>
+    </div>
+    <div id="status"></div>
+  </section>
+
+  <section class="section">
+    <h2>Ограничения</h2>
+    <div class="fields">
+      <label><span class="lbl">Постов за раунд</span><input id="batchSize" type="number" min="1" max="20"></label>
+      <label><span class="lbl">Дневной лимит</span><input id="dailyCap" type="number" min="1" max="50"></label>
+      <label><span class="lbl">Cooldown автора, часов</span><input id="authorCooldownHours" type="number" min="1"></label>
+      <label><span class="lbl">Пауза между постами, от секунд</span><input id="minDelaySec" type="number" min="5"></label>
+      <label><span class="lbl">Пауза между постами, до секунд</span><input id="maxDelaySec" type="number" min="5"></label>
+      <label><span class="lbl">Перед автоотправкой, от секунд</span><input id="preSendMinSec" type="number" min="1"></label>
+      <label><span class="lbl">Перед автоотправкой, до секунд</span><input id="preSendMaxSec" type="number" min="1"></label>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>AI</h2>
+    <div class="ai-actions">
+      <button id="openrouter">Выбрать OpenRouter Free</button>
+      <button id="resetPrompt">Сбросить основной prompt</button>
+    </div>
+    <div class="fields">
+      <label class="full"><span class="lbl">Endpoint</span><input id="endpoint" placeholder="https://openrouter.ai/api/v1"></label>
+      <label><span class="lbl">API path</span><input id="apiPath" value="/chat/completions"></label>
+      <label><span class="lbl">Model</span><input id="model" value="openrouter/free"></label>
+      <label class="full"><span class="lbl">API key</span><input id="apiKey" type="password" autocomplete="off"></label>
+      <label class="full"><span class="lbl">Основной prompt</span><textarea id="prompt"></textarea></label>
+      <label class="full"><span class="lbl">Дополнительные prompt-варианты</span><textarea id="prompts" placeholder="Вариант 1...&#10;---&#10;Вариант 2...&#10;---&#10;Вариант 3..."></textarea></label>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="logs-head">
+      <h2>Логи отладки</h2>
+      <button id="clearLogs">Очистить логи</button>
+    </div>
+    <p class="note">Временный журнал последних событий расширения. Ключи и тексты API здесь не записываются.</p>
+    <pre id="logs">Загрузка…</pre>
+  </section>
+
+</div>
+</section>
+</div>
+<script src="domain.js"></script><script src="options.js"></script>
+</body></html>

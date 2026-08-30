@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "X Accessible Auto Replier",
+  "version": "0.1.0",
+  "description": "Accessibility-first reply assistant for X with bounded automatic mode.",
+  "permissions": ["storage", "alarms", "activeTab"],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "http://127.0.0.1:8642/*",
+    "http://localhost:8642/*",
+    "https://openrouter.ai/*"
+  ],
+  "background": { "service_worker": "src/background.js" },
+  "action": { "default_title": "X Auto Replier", "default_popup": "src/options.html" },
+  "options_page": "src/options.html",
+  "content_scripts": [{
+    "matches": ["https://x.com/*", "https://twitter.com/*"],
+    "js": ["src/domain.js", "src/content.js"],
+    "run_at": "document_idle"
+  }]
+}
