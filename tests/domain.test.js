@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { targetReason, collectTargets, parseReply, parsePrompts, validateReply, canAutoPublish, dayKey, delayMs } = require('../src/domain.js');
+const { targetReason, collectTargets, parseReply, parsePrompts, validateReply, assessReplyNaturalness, formatReply, canAutoPublish, dayKey, delayMs } = require('../src/domain.js');
 
 const valid = { handle: 'alice', postId: '1', text: 'x'.repeat(40), postUrl: 'https://x.com/alice/status/1' };
 
@@ -44,9 +44,14 @@ test('collectTargets queues at most one post per author when cooldown is enabled
   assert.deepEqual(collectTargets(posts, { authorCooldownHours: 24, now: 1000 }).map((post) => post.postId), ['1', '3']);
 });
 
-test('parseReply validates JSON and refusal', () => {
+test('parseReply validates JSON, refusal and safety-only provider output', () => {
   assert.deepEqual(parseReply('{"reply":"hello","shouldReply":true}'), { reply: 'hello', shouldReply: true });
   assert.deepEqual(parseReply('{"reply":"no","shouldReply":false}'), { reply: '', shouldReply: false });
+  assert.deepEqual(parseReply('User: hello there'), { reply: 'hello there', shouldReply: true });
+  assert.deepEqual(parseReply('{"reply":"Assistant: useful point","shouldReply":true}'), { reply: 'useful point', shouldReply: true });
+  assert.deepEqual(parseReply('user safety: safe'), { reply: '', shouldReply: false });
+  assert.deepEqual(parseReply('Safety: blocked.'), { reply: '', shouldReply: false });
+  assert.deepEqual(parseReply('Safety matters in this discussion.'), { reply: 'Safety matters in this discussion.', shouldReply: true });
 });
 
 test('parsePrompts splits variants and uses fallback', () => {
@@ -61,6 +66,17 @@ test('validateReply rejects empty, multiline and oversized replies', () => {
   assert.deepEqual(validateReply('one two', 3), { ok: true });
 });
 
+test('formatReply normalizes dashes and optionally lowercases', () => {
+  assert.equal(formatReply('This is useful -- really useful.'), 'This is useful - really useful.');
+  assert.equal(formatReply('sounds hyped--does grokbot actually handle'), 'sounds hyped - does grokbot actually handle');
+  assert.equal(formatReply('sounds hyped‑does grokbot actually handle'), 'sounds hyped - does grokbot actually handle');
+  assert.equal(formatReply('This Is Useful -- Really Useful.', { lowercase: true }), 'this is useful - really useful.');
+  assert.equal(formatReply('hello world', { minorTypoChance: 100, random: () => 0 }), 'hlelo world');
+});
+test('assessReplyNaturalness flags strong AI-style templates but allows natural replies', () => {
+  assert.deepEqual(assessReplyNaturalness('Great point! This is a crucial and insightful perspective.'), { ok: false, reasons: ['template-phrasing'] });
+  assert.deepEqual(assessReplyNaturalness('What makes this work in practice?'), { ok: true, reasons: [] });
+});
 test('auto mode respects daily cap', () => {
   const day = dayKey();
   assert.deepEqual(canAutoPublish({ mode: 'auto', dailyCap: 2 }, { day, sentToday: 2 }), { ok: false, reason: 'daily-cap' });

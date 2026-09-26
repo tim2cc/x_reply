@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "X Accessible Auto Replier",
+  "name": "Volya Replywise",
   "version": "0.1.0",
   "description": "Accessibility-first reply assistant for X with bounded automatic mode.",
   "permissions": ["storage", "alarms", "activeTab"],
@@ -12,7 +12,7 @@
     "https://openrouter.ai/*"
   ],
   "background": { "service_worker": "src/background.js" },
-  "action": { "default_title": "X Auto Replier", "default_popup": "src/options.html" },
+  "action": { "default_title": "Volya Replywise", "default_popup": "src/options.html" },
   "options_page": "src/options.html",
   "content_scripts": [{
     "matches": ["https://x.com/*", "https://twitter.com/*"],

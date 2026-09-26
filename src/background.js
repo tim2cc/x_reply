@@ -22,13 +22,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const timeout = setTimeout(() => controller.abort(), 45000);
       try {
         const response = await fetch(String(config.endpoint).replace(/\/$/, '') + (config.apiPath || DEFAULTS.apiPath), {
-          method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', 'HTTP-Referer': 'https://x.com/', 'X-Title': 'X Accessible Auto Replier', ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}) },
+          method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', 'HTTP-Referer': 'https://x.com/', 'X-Title': 'Volya Replywise', ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}) },
           body: JSON.stringify({ model: config.model, stream: false, messages: [{ role: 'system', content: selectedPrompt }, { role: 'user', content: `Post by @${message.post.handle}:\n${message.post.text}` }] }),
         });
         if (!response.ok) return sendResponse({ ok: false, reason: `AI HTTP ${response.status}` });
         const data = await response.json();
         const content = data?.choices?.[0]?.message?.content;
-        if (typeof content !== 'string') return sendResponse({ ok: false, reason: 'empty-ai-response' });
+        if (typeof content !== 'string' || !content.trim()) return sendResponse({ ok: false, reason: 'empty-ai-response' });
         sendResponse({ ok: true, content });
       } catch (error) {
         const message = String(error?.message || error);

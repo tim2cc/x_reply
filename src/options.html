@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>X Auto Replier</title><style>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Volya Replywise</title><style>
 :root{
   --bg:#060606;
   --bg-2:#000;
@@ -141,12 +141,71 @@ button.danger:hover{border-color:var(--danger);color:var(--danger)}
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin:0 0 20px}.tab{border:0;border-bottom:2px solid transparent;margin:0;padding:11px 16px;background:transparent;color:var(--text-dim);font:600 11px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.tab:hover{color:var(--text)}.tab.active{border-bottom-color:var(--accent);color:var(--accent)}.tab-panel[hidden]{display:none}.dash-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric{background:var(--bg-2);border:1px solid var(--line);padding:18px;min-height:112px}.metric-label{color:var(--text-dim);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.metric-value{margin-top:14px;color:var(--text);font:300 31px/1.05 Georgia,serif}.metric-value.accent{color:var(--accent)}.dash-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.dash-card{background:var(--bg-2);border:1px solid var(--line);padding:20px}.dash-card h2{margin:0 0 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--text-dim)}.progress{height:8px;background:var(--surface);border:1px solid var(--surface-2);margin:14px 0 8px}.progress>span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}.dash-meta{display:flex;justify-content:space-between;gap:12px;color:var(--text-dim);font:12px ui-monospace,monospace}.dash-list{margin:0;padding:0;list-style:none;font:12px/1.55 ui-monospace,monospace;color:#c9d7b0}.dash-list li{padding:8px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.dash-list li:last-child{border-bottom:0}.dash-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .chart-wrap{width:100%;min-height:240px;background:var(--surface);border:1px solid var(--surface-2);padding:12px;overflow-x:auto}.chart-wrap svg{display:block;width:100%;min-width:520px;height:230px}.chart-grid{stroke:#3d3d3d;stroke-width:1}.chart-bar{fill:#c5ff4a}.chart-label{fill:#8a8a8a;font:10px ui-monospace,monospace}.chart-empty{display:flex;align-items:center;justify-content:center;height:216px;color:#8a8a8a;font:12px ui-monospace,monospace}
 @media(max-width:700px){.dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-layout{grid-template-columns:1fr}}
+
+/* Light, quiet workspace refresh. Keep extension behavior and DOM hooks intact. */
+:root{
+  color-scheme:light;
+  --bg:#f4f5f8;
+  --bg-2:#fff;
+  --surface:#f7f8fb;
+  --surface-2:#e3e6ee;
+  --line:#e5e7ed;
+  --line-2:#d9dde6;
+  --text:#202331;
+  --text-dim:#74798a;
+  --accent:#6655d9;
+  --danger:#c74455;
+}
+html,body{background:var(--bg);color:var(--text)}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+.wrap{max-width:1160px}
+header{padding:0 0 20px;border-bottom-color:var(--line)}
+h1{font-size:25px;letter-spacing:-.035em;font-weight:650;color:#202331}
+.sub,.note,.privacy-note{color:var(--text-dim)}
+.warning{background:#f0edff;border:1px solid #ded8ff;border-left:3px solid var(--accent);border-radius:12px;color:#48416f;padding:13px 16px}
+.tabs{gap:6px;border-bottom-color:var(--line);margin-bottom:18px}
+.tab{border-radius:9px 9px 0 0;letter-spacing:.08em;color:var(--text-dim)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.section,.dash-card,.metric{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 8px rgba(31,36,55,.035)}
+.section{padding:22px}
+.section h2,.dash-card h2{color:#52586a;letter-spacing:.11em}
+.section h2::before{border-radius:50%;background:#8a7be8}
+.metric{min-height:104px;padding:17px 18px}
+.metric-label{color:var(--text-dim);letter-spacing:.1em}
+.metric-value{margin-top:11px;color:#25283a;font:600 29px/1.05 ui-sans-serif,system-ui,sans-serif;letter-spacing:-.04em}
+.metric-value.accent{color:var(--accent)}
+.dash-card{padding:20px}
+.dash-list{color:#50566a}
+.dash-list li{border-bottom-color:#eff0f4}
+input,select,textarea{background:#fff;border-color:#dfe2e9;border-radius:9px;color:#25283a;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:#887be5;box-shadow:0 0 0 3px rgba(102,85,217,.12)}
+input[type="checkbox"]{accent-color:var(--accent)}
+button{border-color:#dfe2e9;border-radius:9px;background:#fff;color:#41465a;letter-spacing:0;transition:background .15s,border-color .15s,transform .15s,box-shadow .15s}
+button:hover{border-color:#bcb4f2;background:#faf9ff;color:#30276f}
+button:active{transform:translateY(1px)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(102,85,217,.18)}
+button.primary:hover{background:#5846c8;border-color:#5846c8;color:#fff}
+button.danger{background:#fff7f7;border-color:#f0d8dc;color:var(--danger)}
+button.danger:hover{background:#fff0f1;border-color:#e9b9c0;color:#a92f40}
+:focus-visible{outline:3px solid rgba(102,85,217,.28);outline-offset:2px}
+#status{color:#5143ba}
+#logs{background:#f8f9fc;border-color:var(--line);border-radius:10px;color:#455064}
+.log-line::before{color:#858b9e}.log-time{color:#858b9e}.log-ok{color:#4e7c25;text-shadow:none}.log-send{color:#248653}.log-retry{color:#9b6a00}.log-error{color:#bc3f4e}.log-scroll{color:#27739a}.log-run{color:#7051a5}.log-muted{color:#74798a}
+.progress{background:#eff0f5;border-color:#e5e7ed;border-radius:999px;overflow:hidden}
+.progress>span{background:linear-gradient(90deg,#887be5,#6655d9)}
+.chart-wrap{background:#fafbfc;border-color:var(--line);border-radius:10px}
+.chart-grid{stroke:#e4e6ed}.chart-bar{fill:#7969df}.chart-label,.chart-empty{fill:#74798a;color:#74798a}
+@media(max-width:700px){body{padding:24px 20px 48px}}
+.community-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:#6655d9;font-size:12px;font-weight:600;text-decoration:none;transition:color .15s}
+.community-link:hover{color:#5846c8;text-decoration:underline;text-underline-offset:3px}
+.community-link:focus-visible{border-radius:4px}
 </style></head>
 <body>
 <div class="wrap">
 <header>
-  <h1>X Accessible Auto Replier</h1>
+  <h1>Volya Replywise</h1>
   <p class="sub">Управление автоматическими ответами и диагностика</p>
+  <a class="community-link" href="https://t.me/andravolya" target="_blank" rel="noopener noreferrer" aria-label="Открыть Telegram-канал @andravolya">Telegram · @andravolya <span aria-hidden="true">↗</span></a>
 </header>
 
 <nav class="tabs" aria-label="Разделы расширения"><button class="tab active" type="button" data-tab="dashboard">Дашборд</button><button class="tab" type="button" data-tab="settings">Настройки</button></nav>
@@ -210,6 +269,9 @@ button.danger:hover{border-color:var(--danger);color:var(--danger)}
       <label class="full"><span class="lbl">API key</span><input id="apiKey" type="password" autocomplete="off"></label>
       <label class="full"><span class="lbl">Основной prompt</span><textarea id="prompt"></textarea></label>
       <label class="full"><span class="lbl">Дополнительные prompt-варианты</span><textarea id="prompts" placeholder="Вариант 1...&#10;---&#10;Вариант 2...&#10;---&#10;Вариант 3..."></textarea></label>
+      <label><span class="lbl">Форматирование</span><span><input id="normalizeDashes" type="checkbox" checked> Заменять двойные дефисы на одинарный</span></label>
+      <label><span class="lbl">Регистр</span><span><input id="lowercaseReplies" type="checkbox"> Писать reply в нижнем регистре</span></label>
+      <label><span class="lbl">Незначительная опечатка</span><span><input id="minorTypoChance" type="number" min="0" max="10" step="1"> % ответов, максимум одна перестановка букв</span></label>
     </div>
   </section>
 

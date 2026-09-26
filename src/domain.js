@@ -18,6 +18,9 @@
     model: 'openrouter/free',
     prompt: 'Write a very short, natural reply that invites discussion. Add one light criticism, nuance, or a single genuine question when appropriate. Stay relevant, do not invent personal experience, do not flatter blindly, and do not use more than 12 words. Return JSON only: {"reply":"...","shouldReply":true}. Set shouldReply to false only when the post is clearly unsuitable for a reply.',
     prompts: '',
+    normalizeDashes: true,
+    lowercaseReplies: false,
+    minorTypoChance: 5,
   });
 
   function normHandle(value) {
@@ -89,17 +92,46 @@
     return { ok: true };
   }
 
+  function assessReplyNaturalness(value) {
+    const reply = String(value || '').trim();
+    if (!reply) return { ok: true, reasons: [] };
+    const templatePatterns = [/great point/i, /absolutely (right|correct)/i, /insightful perspective/i, /it(?:'s| is) (worth noting|important to note)/i, /crucial (and )?(insightful|important)/i, /not just .+ but also/i, /this is a game[- ]changer/i];
+    return templatePatterns.some((pattern) => pattern.test(reply)) ? { ok: false, reasons: ['template-phrasing'] } : { ok: true, reasons: [] };
+  }
+
+  function formatReply(value, options = {}) {
+    let reply = String(value || '').trim();
+    if (options.normalizeDashes !== false) reply = reply.replace(/\s*--+\s*/g, ' - ').replace(/\s*[‐‑‒–—―−﹘﹣－]\s*/g, ' - ');
+    if (options.lowercase === true) reply = reply.toLowerCase();
+    if (Number(options.minorTypoChance) > 0 && (options.random || Math.random)() < Math.min(100, Number(options.minorTypoChance)) / 100) {
+      const words = [...reply.matchAll(/\b[A-Za-zА-Яа-яЁё]{5,}\b/g)];
+      if (words.length) { const word = words[Math.floor((options.random || Math.random)() * words.length)]; const start = word.index; const source = word[0]; const offset = Math.floor((options.random || Math.random)() * (source.length - 2)) + 1; reply = `${reply.slice(0, start + offset)}${source[offset + 1]}${source[offset]}${reply.slice(start + offset + 2)}`; }
+    }
+    return reply;
+  }
+
+  function stripRolePrefix(value) {
+    return String(value || '').trim().replace(/^(?:user|assistant|system)\s*:\s*/i, '').trim();
+  }
+
+  function isSafetyOnlyResponse(value) {
+    const text = String(value || '').trim();
+    return /^(?:user\s+)?safety\s*:\s*(?:safe|unsafe|blocked|allowed|unknown)\s*[.!]?$/i.test(text);
+  }
+
   function parseReply(raw) {
     const text = String(raw || '').trim();
+    if (isSafetyOnlyResponse(text)) return { reply: '', shouldReply: false };
     const match = text.match(/\{[\s\S]*\}/);
     if (match) {
       try {
         const value = JSON.parse(match[0]);
         if (value && value.shouldReply === false) return { reply: '', shouldReply: false };
-        if (value && typeof value.reply === 'string') return { reply: value.reply.trim(), shouldReply: true };
+        if (value && typeof value.reply === 'string') { const reply = stripRolePrefix(value.reply); return { reply, shouldReply: !!reply }; }
       } catch (_) {}
     }
-    return { reply: text.replace(/^['"«]|['"»]$/g, '').trim(), shouldReply: !!text };
+    const reply = stripRolePrefix(text.replace(/^['"«]|['"»]$/g, '').trim());
+    return { reply, shouldReply: !!reply };
   }
 
   function canAutoPublish(config, state) {
@@ -109,7 +141,7 @@
     return { ok: true };
   }
 
-  const api = { DEFAULTS, normHandle, parseStatusHref, targetReason, collectTargets, dayKey, delayMs, parsePrompts, parseReply, validateReply, canAutoPublish };
+  const api = { DEFAULTS, normHandle, parseStatusHref, targetReason, collectTargets, dayKey, delayMs, parsePrompts, parseReply, isSafetyOnlyResponse, validateReply, assessReplyNaturalness, formatReply, canAutoPublish };
   if (typeof module !== 'undefined') module.exports = api;
   if (typeof window !== 'undefined') window.XAR = api;
   else if (typeof globalThis !== 'undefined') globalThis.XAR = api;
